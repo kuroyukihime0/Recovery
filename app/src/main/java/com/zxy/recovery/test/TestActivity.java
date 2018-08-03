@@ -10,8 +10,8 @@ public class TestActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_test);
 //        new Thread(new Runnable() {
 //            int i = 0;
@@ -32,6 +32,11 @@ public class TestActivity extends BaseActivity {
 //                }
 //            }
 //        }).start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void onClick(View view) {

@@ -11,9 +11,10 @@ import android.os.Environment;
 
 import com.zxy.recovery.core.Recovery;
 import com.zxy.recovery.exception.RecoveryException;
-import com.zxy.recovery.exception.ReflectException;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -21,13 +22,20 @@ import java.util.List;
  */
 public class RecoveryUtil {
 
+    private static final ThreadLocal<DateFormat> DATE_FORMAT_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+    };
+
     private RecoveryUtil() {
         throw new RecoveryException("Stub!");
     }
 
     public static <T> T checkNotNull(T t, String message) {
         if (t == null)
-            throw new ReflectException(String.valueOf(message));
+            throw new RecoveryException(String.valueOf(message));
         return t;
     }
 
@@ -122,5 +130,14 @@ public class RecoveryUtil {
     public static void clearApplicationData() {
         clearAppData(getDataDir());
         clearAppData(getExternalDataDir());
+    }
+
+    public static int dp2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static DateFormat getDateFormat() {
+        return DATE_FORMAT_THREAD_LOCAL.get();
     }
 }

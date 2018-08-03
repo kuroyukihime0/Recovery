@@ -3,7 +3,7 @@ apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 26
-    resourcePrefix "recovery_"
+
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
@@ -11,7 +11,7 @@ android {
         versionName "1.0"
 
     }
-
+    
     buildTypes {
         release {
             minifyEnabled false
@@ -22,11 +22,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:25.2.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 Properties properties = new Properties()
@@ -34,9 +34,9 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 
 publish {
     userOrg = 'sunzxyong'
-    uploadName = 'Recovery'
+    uploadName = 'Recovery-no-op'
     groupId = 'com.zxy.android'
-    artifactId = 'recovery'
+    artifactId = 'recovery-no-op'
     publishVersion = RECOVERY_VERSION
     repoName = 'maven'
     dryRun = 'false'
@@ -47,4 +47,3 @@ publish {
     bintrayUser = properties.getProperty("bintray.user")
     bintrayKey = properties.getProperty("bintray.apikey")
 }
-//./gradlew clean build bintrayUpload -PdryRun=false

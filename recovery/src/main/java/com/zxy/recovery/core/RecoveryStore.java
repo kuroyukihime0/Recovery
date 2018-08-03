@@ -63,7 +63,7 @@ public final class RecoveryStore {
     }
 
     public boolean verifyActivity(Activity activity) {
-        return activity != null && !RecoveryActivity.class.isInstance(activity);
+        return activity != null && !Recovery.getInstance().getSkipActivities().contains(activity.getClass()) && !RecoveryActivity.class.isInstance(activity);
     }
 
     public List<WeakReference<Activity>> getRunningActivities() {
@@ -73,6 +73,23 @@ public final class RecoveryStore {
     public void putActivity(Activity activity) {
         WeakReference<Activity> weakReference = new WeakReference<>(activity);
         mRunningActivities.add(weakReference);
+    }
+
+    public boolean contains(Activity activity) {
+        if (activity == null)
+            return false;
+        int size = mRunningActivities.size();
+        for (int i = 0; i < size; i++) {
+            WeakReference<Activity> refer = mRunningActivities.get(i);
+            if (refer == null)
+                continue;
+            Activity tmp = refer.get();
+            if (tmp == null)
+                continue;
+            if (activity == tmp)
+                return true;
+        }
+        return false;
     }
 
     public void removeActivity(Activity activity) {

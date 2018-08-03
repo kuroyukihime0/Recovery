@@ -20,15 +20,23 @@ A crash recovery framework!
 * 一分钟内两次恢复失败不再恢复而进行重启应用
 
 # **Art**
-![recovery](http://7xswxf.com2.z0.glb.qiniucdn.com/blog/Recovery_main.png)
+![recovery](http://7xswxf.com2.z0.glb.qiniucdn.com//blog/recovery.jpg)
 
 # **Usage**
 ## **Reference**
 **Gradle**
 
 ```
-		compile 'com.zxy.android:recovery:0.0.5'
+	implementation 'com.zxy.android:recovery:0.1.6'
 ```
+
+或者
+
+```gradle
+    debugImplementation 'com.zxy.android:recovery:0.1.6'
+    releaseImplementation 'com.zxy.android:recovery-no-op:0.1.6'
+```
+
 
 **Maven**
 
@@ -36,7 +44,7 @@ A crash recovery framework!
 		<dependency>
   			<groupId>com.zxy.android</groupId>
   			<artifactId>recovery</artifactId>
-  			<version>0.0.5</version>
+  			<version>0.1.6</version>
   			<type>pom</type>
 		</dependency>
 ```
@@ -49,24 +57,29 @@ A crash recovery framework!
                 .recoverInBackground(false)
                 .recoverStack(true)
                 .mainPage(MainActivity.class)
+                .recoverEnabled(true)
                 .callback(new MyCrashCallback())
+                .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
+                .skip(TestActivity.class)
                 .init(this);
-```
-并且在manifest中授权
-
-```
-android.permission.GET_TASKS
 ```
 
 如果你不想在应用发生Crash时显示RecoveryActivity，你可以使用静默恢复来进行无界面的恢复你的应用，那么请使用类似如下初始化代码在你自定义的Application中进行初始化：
 
 ```java
-Recovery.getInstance()
-        .debug(true)
-        .recoverInBackground(false)
-        .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
-        .init(this);
+        Recovery.getInstance()
+                .debug(true)
+                .recoverInBackground(false)
+                .recoverStack(true)
+                .mainPage(MainActivity.class)
+                .recoverEnabled(true)
+                .callback(new MyCrashCallback())
+                .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
+                .skip(TestActivity.class)
+                .init(this);
 ```
+
+如果你仅仅需要在开发时显示RecoveryActivity界面来获取debug数据，而在线上版本不显示，那么可以设置`recoverEnabled(false);`
 
 ## **Arguments**
 
@@ -95,6 +108,8 @@ public interface RecoveryCallback {
     void cause(String cause);
 
     void exception(String throwExceptionType, String throwClassName, String throwMethodName, int throwLineNumber);
+    
+    void throwable(Throwable throwable);
 }
 ```
 
@@ -103,16 +118,27 @@ public interface RecoveryCallback {
 自定义RecoveryActivity的主题，需重写以下styles属性：
 
 ```
-    <color name="recoveryColorPrimary">#F44336</color>
-    <color name="recoveryColorPrimaryDark">#D32F2F</color>
-    <color name="recoveryColorAccent">#BDBDBD</color>
-    <color name="recoveryTextColor">#FFFFFF</color>
+    <color name="recovery_colorPrimary">#2E2E36</color>
+    <color name="recovery_colorPrimaryDark">#2E2E36</color>
+    <color name="recovery_colorAccent">#BDBDBD</color>
+    <color name="recovery_background">#3C4350</color>
+    <color name="recovery_textColor">#FFFFFF</color>
+    <color name="recovery_textColor_sub">#C6C6C6</color>
 ```
 ## **Crash File Path**
 > {SDCard Dir}/Android/data/{packageName}/files/recovery_crash/
 
 ## **Update history**
-`VERSION-0.0.5`——**支持静默恢复**
+* `VERSION-0.0.5`——**支持静默恢复**
+* `VERSION-0.0.6`——**加强静默恢复模式的保护**
+* `VERSION-0.0.7`——**添加混淆配置**
+* `VERSION-0.0.8`——**增加可配置不需要恢复的Activity,方法:skip()**
+* `VERSION-0.0.9`——**更新UI和解决一些问题**
+* `VERSION-0.1.0`——**异常传递的优化,可在任意位置初始化Recovery框架,发布正式版本**
+* `VERSION-0.1.3`——**增加no-op包**
+* `VERSION-0.1.4`——**更新默认主题.**
+* `VERSION-0.1.5`——**fix 8.0+ hook bug**
+* `VERSION-0.1.6`——**update**
 
 # **LICENSE**
 

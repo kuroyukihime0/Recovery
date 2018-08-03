@@ -2,6 +2,7 @@ package com.zxy.recovery.core;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,10 +25,8 @@ import com.zxy.recovery.tools.Reflect;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by zhengxiaoyong on 16/8/26.
@@ -73,10 +73,12 @@ public final class RecoveryActivity extends AppCompatActivity {
 
     private TextView mCrashTipsTv;
 
+    private ScrollView mScrollView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recovery);
+        setContentView(R.layout.recovery_activity_recover);
         setupToolbar();
         initView();
         initData();
@@ -104,10 +106,10 @@ public final class RecoveryActivity extends AppCompatActivity {
         if (!isDebugMode)
             return false;
         if (isDebugModeActive) {
-            getMenuInflater().inflate(R.menu.menu_recovery_sub, menu);
+            getMenuInflater().inflate(R.menu.recovery_menu_sub, menu);
             return true;
         }
-        getMenuInflater().inflate(R.menu.menu_recovery, menu);
+        getMenuInflater().inflate(R.menu.recovery_menu, menu);
         return true;
     }
 
@@ -138,6 +140,11 @@ public final class RecoveryActivity extends AppCompatActivity {
         mStackTraceTv = (TextView) findViewById(R.id.tv_stack_trace);
         mCauseTv = (TextView) findViewById(R.id.tv_cause);
         mCrashTipsTv = (TextView) findViewById(R.id.tv_crash_tips);
+        mScrollView = (ScrollView) findViewById(R.id.scrollView);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            mScrollView.setPadding(0, RecoveryUtil.dp2px(getApplication(), 16), 0, 0);
+        }
     }
 
     private void initData() {
@@ -208,9 +215,13 @@ public final class RecoveryActivity extends AppCompatActivity {
         if (mExceptionData != null) {
             String type = mExceptionData.type == null ? "" : mExceptionData.type;
             String name = mExceptionData.className == null ? "" : mExceptionData.className;
+
             mExceptionTypeTv.setText(String.format(getResources().getString(R.string.recovery_exception_type), type.substring(type.lastIndexOf('.') + 1)));
+
             mClassNameTv.setText(String.format(getResources().getString(R.string.recovery_class_name), name.substring(name.lastIndexOf('.') + 1)));
+
             mMethodNameTv.setText(String.format(getResources().getString(R.string.recovery_method_name), mExceptionData.methodName));
+
             mLineNumberTv.setText(String.format(getResources().getString(R.string.recovery_line_number), mExceptionData.lineNumber));
         }
         mCauseTv.setText(String.valueOf(mCause));
@@ -299,8 +310,7 @@ public final class RecoveryActivity extends AppCompatActivity {
     }
 
     private boolean saveCrashData() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
-        String date = format.format(new Date(System.currentTimeMillis()));
+        String date = RecoveryUtil.getDateFormat().format(new Date(System.currentTimeMillis()));
         File dir = new File(getExternalFilesDir(null) + File.separator + DEFAULT_CRASH_FILE_DIR_NAME);
         if (!dir.exists())
             dir.mkdirs();

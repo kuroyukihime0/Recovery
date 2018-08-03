@@ -20,15 +20,23 @@ A crash recovery framework!
 * Allows you to do a restart instead of recovering if failed twice in one minute.
 
 # **Art**
-![recovery](http://7xswxf.com2.z0.glb.qiniucdn.com/blog/Recovery_main.png)
+![recovery](http://7xswxf.com2.z0.glb.qiniucdn.com//blog/recovery.jpg)
 
 # **Usage**
 ## **Installation**
 **Using Gradle**
 
 ```gradle
-compile 'com.zxy.android:recovery:0.0.5'
+    implementation 'com.zxy.android:recovery:0.1.6'
 ```
+
+or
+
+```gradle
+    debugImplementation 'com.zxy.android:recovery:0.1.6'
+    releaseImplementation 'com.zxy.android:recovery-no-op:0.1.6'
+```
+
 
 **Using Maven**
 
@@ -36,7 +44,7 @@ compile 'com.zxy.android:recovery:0.0.5'
 <dependency>
   	<groupId>com.zxy.android</groupId>
   	<artifactId>recovery</artifactId>
-  	<version>0.0.5</version>
+  	<version>0.1.6</version>
   	<type>pom</type>
 </dependency>
 ```
@@ -45,18 +53,16 @@ compile 'com.zxy.android:recovery:0.0.5'
 You can use this code sample to initialize Recovery in your application:
 
 ```java
-Recovery.getInstance()
-        .debug(true)
-        .recoverInBackground(false)
-        .recoverStack(true)
-        .mainPage(MainActivity.class)
-        .callback(new MyCrashCallback())
-        .init(this);
-```
-and grant permission:
-
-```
-android.permission.GET_TASKS
+        Recovery.getInstance()
+                .debug(true)
+                .recoverInBackground(false)
+                .recoverStack(true)
+                .mainPage(MainActivity.class)
+                .recoverEnabled(true)
+                .callback(new MyCrashCallback())
+                .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
+                .skip(TestActivity.class)
+                .init(this);
 ```
 
 If you don't want to show the RecoveryActivity when the application crash in runtime,you can use silence recover to restore your application.
@@ -64,12 +70,19 @@ If you don't want to show the RecoveryActivity when the application crash in run
 You can use this code sample to initialize Recovery in your application:
 
 ```java
-Recovery.getInstance()
-        .debug(true)
-        .recoverInBackground(false)
-        .silent(false, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
-        .init(this);
+        Recovery.getInstance()
+                .debug(true)
+                .recoverInBackground(false)
+                .recoverStack(true)
+                .mainPage(MainActivity.class)
+                .recoverEnabled(true)
+                .callback(new MyCrashCallback())
+                .silent(true, Recovery.SilentMode.RECOVER_ACTIVITY_STACK)
+                .skip(TestActivity.class)
+                .init(this);
 ```
+
+If you only need to display 'RecoveryActivity' page in development to obtain the debug data, and in the online version does not display, you can set up `recoverEnabled(false);`
 
 ## **Arguments**
 
@@ -103,6 +116,8 @@ public interface RecoveryCallback {
     	String throwMethodName,
     	int throwLineNumber
     );
+    
+    void throwable(Throwable throwable);
 }
 ```
 
@@ -111,10 +126,12 @@ public interface RecoveryCallback {
 You can customize UI by setting these properties in your styles file:
 
 ```xml
-<color name="recoveryColorPrimary">#F44336</color>
-<color name="recoveryColorPrimaryDark">#D32F2F</color>
-<color name="recoveryColorAccent">#BDBDBD</color>
-<color name="recoveryTextColor">#FFFFFF</color>
+    <color name="recovery_colorPrimary">#2E2E36</color>
+    <color name="recovery_colorPrimaryDark">#2E2E36</color>
+    <color name="recovery_colorAccent">#BDBDBD</color>
+    <color name="recovery_background">#3C4350</color>
+    <color name="recovery_textColor">#FFFFFF</color>
+    <color name="recovery_textColor_sub">#C6C6C6</color>
 ```
 
 ## **Crash File Path**
@@ -122,7 +139,16 @@ You can customize UI by setting these properties in your styles file:
 
 ----
 ## **Update history**
-`VERSION-0.0.5`——**Support silent recovery**
+* `VERSION-0.0.5`——**Support silent recovery**
+* `VERSION-0.0.6`——**Strengthen the protection of silent restore mode**
+* `VERSION-0.0.7`——**Add confusion configuration**
+* `VERSION-0.0.8`——**Add the skip Activity features,method:skip()**
+* `VERSION-0.0.9`——**Update the UI and solve some problems**
+* `VERSION-0.1.0`——**Optimization of crash exception delivery, initial Recovery framework can be in any position, release the official version-0.1.0**
+* `VERSION-0.1.3`——**Add 'no-op' support**
+* `VERSION-0.1.4`——**update default theme**
+* `VERSION-0.1.5`——**fix 8.0+ hook bug**
+* `VERSION-0.1.6`——**update**
 
 # **LICENSE**
 

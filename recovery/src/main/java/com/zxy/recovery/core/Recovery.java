@@ -11,6 +11,10 @@ import com.zxy.recovery.exception.RecoveryException;
 import com.zxy.recovery.tools.RecoveryLog;
 import com.zxy.recovery.tools.RecoveryUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by zhengxiaoyong on 16/8/26.
  */
@@ -42,6 +46,13 @@ public class Recovery {
 
     private SilentMode mSilentMode = SilentMode.RECOVER_ACTIVITY_STACK;
 
+    private List<Class<? extends Activity>> mSkipActivities = new ArrayList<>();
+
+    /**
+     * Whether to enter recovery mode.
+     */
+    private boolean isRecoverEnabled = true;
+
     private Recovery() {
     }
 
@@ -62,6 +73,8 @@ public class Recovery {
         if (!(context instanceof Application))
             context = context.getApplicationContext();
         mContext = context;
+        if (!RecoveryUtil.isMainProcess(context))
+            return;
         registerRecoveryHandler();
         registerRecoveryLifecycleCallback();
     }
@@ -94,6 +107,19 @@ public class Recovery {
     public Recovery silent(boolean enabled, SilentMode mode) {
         this.isSilentEnabled = enabled;
         this.mSilentMode = mode == null ? SilentMode.RECOVER_ACTIVITY_STACK : mode;
+        return this;
+    }
+
+    @SafeVarargs
+    public final Recovery skip(Class<? extends Activity>... activities) {
+        if (activities == null)
+            return this;
+        mSkipActivities.addAll(Arrays.asList(activities));
+        return this;
+    }
+
+    public Recovery recoverEnabled(boolean enabled) {
+        this.isRecoverEnabled = enabled;
         return this;
     }
 
@@ -142,6 +168,10 @@ public class Recovery {
         return isRecoverStack;
     }
 
+    boolean isRecoverEnabled() {
+        return isRecoverEnabled;
+    }
+
     Class<? extends Activity> getMainPageClass() {
         return mMainPageClass;
     }
@@ -152,6 +182,10 @@ public class Recovery {
 
     SilentMode getSilentMode() {
         return mSilentMode;
+    }
+
+    public List<Class<? extends Activity>> getSkipActivities() {
+        return mSkipActivities;
     }
 
     public enum SilentMode {
